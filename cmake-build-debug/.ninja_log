@@ -1,0 +1,9 @@
+# ninja log v5
+7	440	7548722424301114	CMakeFiles/PEAProjekt3.dir/main.cpp.obj	49a2ee78b47da627
+359	882	7548723049034138	PEAProjekt3.exe	dabc27c06b040aa0
+7	359	7548723043866817	CMakeFiles/PEAProjekt3.dir/Main.cpp.obj	836bb1e7c11d720
+31	1026	7548726614913003	CMakeFiles/PEAProjekt3.dir/Main.cpp.obj	836bb1e7c11d720
+74	934	7548730238187561	CMakeFiles/PEAProjekt3.dir/TSP.cpp.obj	5e846e1cdb166bff
+7	1111	7548730239931992	CMakeFiles/PEAProjekt3.dir/File_manager.cpp.obj	6abca2682cc6d21e
+38	1123	7548730240072496	CMakeFiles/PEAProjekt3.dir/Main.cpp.obj	836bb1e7c11d720
+1123	1882	7548730247620211	PEAProjekt3.exe	9cde0519a358a2da
