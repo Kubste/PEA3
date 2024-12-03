@@ -10,7 +10,8 @@ void Main::run() {
     chrono::duration<double, micro> time{};
     chrono::high_resolution_clock::time_point t0;
 
-    assign_parameters(file_manager.read_config_file(config_path));
+    tuple<vector<string>, vector<int>, vector<float>> config_data = file_manager.read_config_file(config_path);
+    assign_parameters(get<0>(config_data), get<1>(config_data), get<2>(config_data));
     data = file_manager.read_data_file(data_path);
     matrix = data.first;
     optimal_value = data.second;
@@ -24,7 +25,7 @@ void Main::run() {
 
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
-        if(method == 1) results = tsp.SA(T0, L0, upper_bound);
+        if(method == 1) results = tsp.SA(T0, L0, upper_bound, a, cooling_scheme, solution_generator);
 
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
         print_partial_results(results, i + 1, time);
@@ -36,19 +37,22 @@ void Main::run() {
                                total_time/time_measurements, total_absolute_error/repetitions, total_relative_error/repetitions);
 }
 
-void Main::assign_parameters(pair<vector<string>, vector<int>> parameters) {
-    data_path = parameters.first[0];
-    result_path = parameters.first[1];
-    method = parameters.second[0];
-    if(parameters.second[1] == -1) minutesSA = INT_MAX;
-    else minutesSA = parameters.second[1];
-    if(parameters.second[2] == -1) minutesTS = INT_MAX;
-    else minutesTS = parameters.second[2];
-    T0 = parameters.second[3];
-    L0 = parameters.second[4];
-    upper_bound = parameters.second[5];
-    repetitions = parameters.second[6];
-    progress_indicator = parameters.second[7];
+void Main::assign_parameters(vector<string> parameters_string, vector<int> parameters_int, vector<float> parameters_float) {
+    data_path = parameters_string[0];
+    result_path = parameters_string[1];
+    method = parameters_int[0];
+    if(parameters_int[1] == -1) minutesSA = INT_MAX;
+    else minutesSA = parameters_int[1];
+    if(parameters_int[2] == -1) minutesTS = INT_MAX;
+    else minutesTS = parameters_int[2];
+    cooling_scheme = parameters_int[3];
+    solution_generator = parameters_int[4];
+    L0 = parameters_int[5];
+    upper_bound = parameters_int[6];
+    repetitions = parameters_int[7];
+    progress_indicator = parameters_int[8];
+    T0 = parameters_float[0];
+    a = parameters_float[1];
 }
 
 void Main::print_info() {
@@ -57,9 +61,8 @@ void Main::print_info() {
     cout << endl << "Plik zawierajacy dane problemu: " << data_path.substr(position + 1) << endl;
     cout << "Wynik optymalny: " << optimal_value << endl;
     cout << "Wybrana metoda: ";
-    if(method == 1) cout << "DFS" << endl;
-    else if(method == 2) cout << "BFS" << endl;
-    else if(method == 3) cout << "low cost" << endl;
+    if(method == 1) cout << "Symulowane wyzarzanie" << endl;
+    else if(method == 2) cout << "Tabu Search" << endl;
     cout << "Liczba powtorzen przeszukania: " << repetitions << endl;
     if(method == 1 && minutesSA != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesSA << " min" << endl;
     else if(method == 1) cout << "Brak ograniczenia czasowego" << endl;
@@ -126,6 +129,7 @@ int Main::calculate_path_length(vector<int> path) {
 }
 
 int main() {
+    srand(time(nullptr));
     Main main_obj{};
     main_obj.run();
     cout << endl;

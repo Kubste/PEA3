@@ -23,7 +23,7 @@ public:
     void set_matrix(vector<vector<int>> matrix);
     pair<vector<int>, int> NN();
     void explore_paths(vector<int> path, int path_length, vector<int> Q, int current_node, int start_node, pair<vector<int>, int> &resultsNN);
-    pair<vector<int>, int> SA(int T0, int L0, int upper_bound);
+    pair<vector<int>, int> SA(float T0, int L0, int upper_bound, float a, int cooling_scheme, int solution_generator);
 
 private:
     vector<vector<int>> matrix;
@@ -35,7 +35,8 @@ private:
     int calculate_path_length(vector<int> path);
     double calculate_probability(float Xa, float Xk, float T);
     bool decide_accept(double probability);
-    int calculate_T_linear(int T, int a);
+    float calculate_T(float T, float a, int cooling_scheme, int k);
+    pair<vector<int>, int> generate_solution(pair<vector<int>, int> path, int type);
 };
 
 #endif

@@ -21,8 +21,11 @@ private:
     int method;
     int minutesSA;
     int minutesTS;
-    int T0;
+    float T0;
+    float a;
     int L0;
+    int cooling_scheme;
+    int solution_generator;
     int upper_bound;
     int optimal_value;
     int progress_indicator;
@@ -36,7 +39,7 @@ private:
     vector<chrono::duration<double, micro>> total_times;
     int time_measurements = 0;
 
-    void assign_parameters(pair<vector<string>, vector<int>> parameters);
+    void assign_parameters(vector<string> parameters_string, vector<int> parameters_int, vector<float> parameters_float);
     void print_info();
     void print_partial_results(pair<vector<int>, int> results, int repetition, chrono::duration<double, micro> time);
     int calculate_path_length(vector<int> path);
