@@ -6,9 +6,79 @@ void TSP::set_matrix(vector<vector<int>> matrix) {
 }
 
 void TSP::set_min_value() {
-    for(int i = 0; i < matrix.size(); i++) {
-        for(int j = 0; j < matrix[i].size(); j++) if(matrix[i][j] < min_value && matrix[i][j] >= 0) min_value = matrix[i][j];
+    for(auto & i : matrix) for(int j : i) if(j < min_value && j >= 0) min_value = j;
+}
+
+pair<vector<int>, int> TSP::SA(int T0, int L0, int upper_bound) {
+    int T = T0;
+    int L = L0;
+    pair<vector<int>, int> randomResults;
+
+    results.second = INT_MAX;
+    if(upper_bound == 1) results = NN();
+    else results = random();
+
+    while(T > 0) {
+        for(int k = 0; k < L0; k++) {
+            randomResults = random();
+
+            if(randomResults.second < results.second) results = randomResults;
+            else {
+                double probability = calculate_probability(results.second, randomResults.second, T);
+                if (decide_accept(probability)) results = randomResults;
+            }
+        }
+        T = calculate_T_linear(T, 1);
     }
+    return results;
+}
+
+int TSP::calculate_T_linear(int T, int a) {
+    return T - a;
+}
+
+double TSP::calculate_probability(float Xa, float Xk, float T) {
+    const double EulerConstant = std::exp(1.0);
+    return pow(EulerConstant, (Xa - Xk) / T);
+}
+
+bool TSP::decide_accept(double probability) {
+    double X = ((double) rand() / (double) RAND_MAX);
+    if(X < probability) return true;
+    else return false;
+}
+
+pair<vector<int>, int> TSP::random() {
+    pair<vector<int>, int> randomResults;
+    vector<int> path;
+    random_device random;
+    mt19937 g(static_cast<unsigned>(chrono::system_clock::now().time_since_epoch().count()));
+    randomResults.second = INT_MAX;
+
+    for(int i = 0; i < matrix.size(); i++) path.push_back(i);
+
+    while(randomResults.second == INT_MAX) {
+        shuffle(path.begin(), path.end(), g);
+        reverse(path.begin() + g() % matrix.size(), path.end());
+
+        path.push_back(path.front());
+        randomResults.first = path;
+        randomResults.second = calculate_path_length(path);
+
+        path.pop_back();
+    }
+
+    return randomResults;
+}
+
+int TSP::calculate_path_length(vector<int> path) {
+    int path_length = 0;
+
+    for(int i = 0; i < path.size() - 1; i++) {
+        if(matrix[path[i]][path[i + 1]] == -1) return INT_MAX;
+        else path_length = path_length + matrix[path[i]][path[i + 1]];
+    }
+    return path_length;
 }
 
 pair<vector<int>, int> TSP::NN() {
@@ -62,9 +132,9 @@ void TSP::explore_paths(vector<int> path, int path_length, vector<int> Q, int cu
         }
     }
 
-    for(int i = 0; i < min_edges.size(); i++) {
-        next_node = min_edges[i].first;
-        edge_length = min_edges[i].second;
+    for(auto & min_edge : min_edges) {
+        next_node = min_edge.first;
+        edge_length = min_edge.second;
 
         new_path = path;
         new_path.push_back(next_node);

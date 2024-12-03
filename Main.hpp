@@ -19,9 +19,10 @@ private:
     string data_path;
     string result_path;
     int method;
-    int minutesD;
-    int minutesB;
-    int minutesL;
+    int minutesSA;
+    int minutesTS;
+    int T0;
+    int L0;
     int upper_bound;
     int optimal_value;
     int progress_indicator;

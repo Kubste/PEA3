@@ -22,6 +22,13 @@ void Main::run() {
     cout << "Zakonczono przygotowywanie" << endl;
     system("pause");
 
+    for(int i = 0; i < repetitions; i++) {
+        t0 = chrono::high_resolution_clock::now();
+        if(method == 1) results = tsp.SA(T0, L0, upper_bound);
+
+        time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
+        print_partial_results(results, i + 1, time);
+    }
 
     if(progress_indicator) print_info();
     print_total_results();
@@ -29,19 +36,19 @@ void Main::run() {
                                total_time/time_measurements, total_absolute_error/repetitions, total_relative_error/repetitions);
 }
 
-void Main::assign_parameters(pair<vector<std::string>, vector<int>> parameters) {
+void Main::assign_parameters(pair<vector<string>, vector<int>> parameters) {
     data_path = parameters.first[0];
     result_path = parameters.first[1];
     method = parameters.second[0];
-    if(parameters.second[1] == -1) minutesD = INT_MAX;
-    else minutesD = parameters.second[1];
-    if(parameters.second[2] == -1) minutesB = INT_MAX;
-    else minutesB = parameters.second[2];
-    if(parameters.second[3] == -1) minutesL = INT_MAX;
-    else minutesL = parameters.second[3];
-    upper_bound = parameters.second[4];
-    repetitions = parameters.second[5];
-    progress_indicator = parameters.second[6];
+    if(parameters.second[1] == -1) minutesSA = INT_MAX;
+    else minutesSA = parameters.second[1];
+    if(parameters.second[2] == -1) minutesTS = INT_MAX;
+    else minutesTS = parameters.second[2];
+    T0 = parameters.second[3];
+    L0 = parameters.second[4];
+    upper_bound = parameters.second[5];
+    repetitions = parameters.second[6];
+    progress_indicator = parameters.second[7];
 }
 
 void Main::print_info() {
@@ -54,12 +61,10 @@ void Main::print_info() {
     else if(method == 2) cout << "BFS" << endl;
     else if(method == 3) cout << "low cost" << endl;
     cout << "Liczba powtorzen przeszukania: " << repetitions << endl;
-    if(method == 1 && minutesD != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesD << " min" << endl;
+    if(method == 1 && minutesSA != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesSA << " min" << endl;
     else if(method == 1) cout << "Brak ograniczenia czasowego" << endl;
-    else if(method == 2 && minutesB != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesB << " min" << endl;
+    else if(method == 2 && minutesTS != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesTS << " min" << endl;
     else if(method == 2) cout << "Brak ograniczenia czasowego" << endl;
-    else if(method == 3 && minutesL != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesL << " min" << endl;
-    else if(method == 3) cout << "Brak ograniczenia czasowego" << endl;
     cout << endl;
 }
 

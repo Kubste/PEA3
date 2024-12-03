@@ -1,9 +1,10 @@
 Ścieżka pliku wejściowego# data10a.txt
 Ścieżak pliku wyjściowego# results.csv
-Wybrana metoda 1 - DFS 2 - BFS 3 - low cost# 1
-Maksymalny czas przeszukiwania dla metody DFS(-1 -> brak ograniczenia)# 30
-Maksymalny czas przeszukiwania dla metody BFS(-1 -> brak ograniczenia)# 30
-Maksymalny czas przeszukiwania dla metody low cost(-1 -> brak ograniczenia)# 30
-Czy zastosować ograniczenie górne wyznaczone za pomocą algorytmu NN 0 - nie 1 - tak# 1
+Wybrana metoda 1 - symulowane wyzarzanie 2 - Tabu Search# 1
+Maksymalny czas przeszukiwania dla metody symulowanego wyzarzania(-1 -> brak ograniczenia)# 15
+Maksymalny czas przeszukiwania dla metody Tabu Search(-1 -> brak ograniczenia)# 15
+Poczatkowa wartosc parametru kontrolnego("temperatury")# 200
+Poczatkowa liczba transformacji# 10000
+Czy zastosować ograniczenie górne wyznaczone za pomocą algorytmu NN 0 - nie 1 - tak# 0
 Liczba powtorzeń przeszukiwania instancji# 10
 Wyświetlanie wskaźnika postępu 0 - wyłączone 1 - włączone# 0
