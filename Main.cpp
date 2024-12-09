@@ -26,7 +26,7 @@ void Main::run() {
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
         if(method == 1) results = tsp.SA(T0, L0, upper_bound, a, cooling_scheme, solution_generator, minutesSA);
-        else if(method == 2) results = tsp.TS(10000, 100, 100, upper_bound);
+        else if(method == 2) results = tsp.TS(max_iterations, tabu_tenure, restart_val, upper_bound, solution_generator);
 
 
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
@@ -50,9 +50,12 @@ void Main::assign_parameters(vector<string> parameters_string, vector<int> param
     cooling_scheme = parameters_int[3];
     solution_generator = parameters_int[4];
     L0 = parameters_int[5];
-    upper_bound = parameters_int[6];
-    repetitions = parameters_int[7];
-    progress_indicator = parameters_int[8];
+    max_iterations = parameters_int[6];
+    tabu_tenure = parameters_int[7];
+    restart_val = parameters_int[8];
+    upper_bound = parameters_int[9];
+    repetitions = parameters_int[10];
+    progress_indicator = parameters_int[11];
     T0 = parameters_float[0];
     a = parameters_float[1];
 }

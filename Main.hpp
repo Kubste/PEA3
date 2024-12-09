@@ -26,6 +26,9 @@ private:
     int L0;
     int cooling_scheme;
     int solution_generator;
+    int max_iterations;
+    int tabu_tenure;
+    int restart_val;
     int upper_bound;
     int optimal_value;
     int progress_indicator;

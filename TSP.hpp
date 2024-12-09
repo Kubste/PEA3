@@ -24,7 +24,7 @@ public:
     pair<vector<int>, int> NN();
     void explore_paths(vector<int> path, int path_length, vector<int> Q, int current_node, int start_node, pair<vector<int>, int> &resultsNN);
     pair<vector<int>, int> SA(float T0, int L0, int upper_bound, float a, int cooling_scheme, int solution_generator, int minutesSa);
-    pair<vector<int>, int> TS(int max_iterations, int tabu_tenure, int restart_val, int upper_bound);
+    pair<vector<int>, int> TS(int max_iterations, int tenure, int restart_val, int upper_bound, int solution_generator);
 
 private:
     vector<vector<int>> matrix;
@@ -34,13 +34,13 @@ private:
     void set_min_value();
     pair<vector<int>, int> random();
     int calculate_path_length(vector<int> path);
-    double calculate_probability(float Xa, float Xk, float T);
-    bool decide_accept(double probability);
-    float calculate_T(float T, float a, int cooling_scheme, int k);
+    static double calculate_probability(float Xa, float Xk, float T);
+    static bool decide_accept(double probability);
+    static float calculate_T(float T, float a, int cooling_scheme, int k);
     pair<vector<int>, int> generate_solution(pair<vector<int>, int> path, int type);
-    vector<pair<vector<int>, int>> generate_neighbourhood(vector<int> solution);
-    bool is_in_tabu_list(const vector<pair<int, int>>& tabu_list, int attribute);
-    void update_tabu_list(vector<pair<int, int>>& tabu_list);
+    vector<pair<vector<int>, int>> generate_surroundings(vector<int> solution, int solution_generator);
+    static bool is_in_tabu_list(const vector<pair<int, int>>& tabu_list, int attribute);
+    static void update_tabu_list(vector<pair<int, int>>& tabu_list);
 };
 
 #endif

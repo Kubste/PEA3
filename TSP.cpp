@@ -72,8 +72,8 @@ float TSP::calculate_T(float T, float a, int cooling_scheme, int k) {
         case 3: return T * pow(a, k);
         case 4: return T * pow((1 + pow(a, k)), -1);
         case 5: return T / (log(1 + k + 1));
+        default: return 0;
     }
-    return 0;
 }
 
 double TSP::calculate_probability(float Xa, float Xk, float T) {
@@ -87,7 +87,7 @@ bool TSP::decide_accept(double probability) {
     else return false;
 }
 
-pair<vector<int>, int> TSP::TS(int max_iterations, int tabu_tenure, int restart_val, int upper_bound) {
+pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, int upper_bound, int solution_generator) {
 
     int restart = restart_val;
     results.second = INT_MAX;
@@ -99,25 +99,25 @@ pair<vector<int>, int> TSP::TS(int max_iterations, int tabu_tenure, int restart_
     vector<pair<int, int>> tabu_list;
 
     for(int iteration = 0; iteration < max_iterations; iteration++) {
-        vector<pair<vector<int>, int>> neighbourhood = generate_neighbourhood(xa.first);
-        pair<vector<int>, int> best_neighbour;
-        best_neighbour.second = INT_MAX;
+        vector<pair<vector<int>, int>> surroundings = generate_surroundings(xa.first, solution_generator);
+        pair<vector<int>, int> best_solution;
+        best_solution.second = INT_MAX;
 
         int best_move_attribute = -1;
-        for(int i = 0; i < neighbourhood.size(); i++) {
-            pair<vector<int>, int> neighbour = neighbourhood[i];
+        for(int i = 0; i < surroundings.size(); i++) {
+            pair<vector<int>, int> solution = surroundings[i];
             int move_attribute = i;
 
-            if(neighbour.second < best_neighbour.second && (!is_in_tabu_list(tabu_list, move_attribute) || neighbour.second < results.second)) {
-                best_neighbour = neighbour;
-                best_neighbour.second = neighbour.second;
+            if(solution.second < best_solution.second && (!is_in_tabu_list(tabu_list, move_attribute) || solution.second < results.second)) {
+                best_solution = solution;
+                best_solution.second = solution.second;
                 best_move_attribute = move_attribute;
             }
         }
-        xa = best_neighbour;
+        xa = best_solution;
 
-        if(best_neighbour.second < results.second) results = best_neighbour;
-        if(best_move_attribute != -1) tabu_list.emplace_back(best_move_attribute, tabu_tenure);
+        if(best_solution.second < results.second) results = best_solution;
+        if(best_move_attribute != -1) tabu_list.emplace_back(best_move_attribute, tenure);
 
         update_tabu_list(tabu_list);
 
@@ -144,23 +144,27 @@ bool TSP::is_in_tabu_list(const vector<pair<int, int>>& tabu_list, int attribute
     return false;
 }
 
-vector<pair<vector<int>, int>> TSP::generate_neighbourhood(vector<int> solution) {
-    vector<pair<vector<int>, int>> neighbourhood;
+vector<pair<vector<int>, int>> TSP::generate_surroundings(vector<int> solution, int solution_generator) {
+    vector<pair<vector<int>, int>> surroundings;
     solution.pop_back();
     int size = solution.size();
 
     for(int i = 0; i < size; i++) {
         for(int j = i + 1; j < size; j++) {
             vector<int> new_solution = solution;
-            reverse(new_solution.begin() + i, new_solution.begin() + j + 1);
+            if(solution_generator == 1) swap(new_solution[i], new_solution[j]);
+            else if(solution_generator == 2) reverse(new_solution.begin() + i, new_solution.begin() + j + 1);
+            else if(solution_generator == 3) {
+                int value_to_insert = new_solution[i];
+                new_solution.erase(new_solution.begin() + i);
+                new_solution.insert(new_solution.begin() + j, value_to_insert);
+            }
             new_solution.push_back(new_solution.front());
             int new_solution_length = calculate_path_length(new_solution);
-            if(new_solution_length != INT_MAX) {
-                neighbourhood.emplace_back(new_solution, new_solution_length);
-            }
+            if(new_solution_length != INT_MAX) surroundings.emplace_back(new_solution, new_solution_length);
         }
     }
-    return neighbourhood;
+    return surroundings;
 }
 
 pair<vector<int>, int> TSP::random() {
