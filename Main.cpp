@@ -25,7 +25,9 @@ void Main::run() {
 
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
-        if(method == 1) results = tsp.SA(T0, L0, upper_bound, a, cooling_scheme, solution_generator);
+        if(method == 1) results = tsp.SA(T0, L0, upper_bound, a, cooling_scheme, solution_generator, minutesSA);
+        else if(method == 2) results = tsp.TS(10000, 100, 100, upper_bound);
+
 
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
         print_partial_results(results, i + 1, time);
