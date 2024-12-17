@@ -29,10 +29,7 @@ pair<vector<int>, int> TSP::SA(float T0, int L0, int upper_bound, float a, int c
             }
 
             if(surrounding_solution.second < results.second) results = surrounding_solution;
-            else {
-                double probability = calculate_probability(results.second, surrounding_solution.second, T);
-                if(decide_accept(probability)) results = surrounding_solution;
-            }
+            else if(decide_accept(calculate_probability(results.second, surrounding_solution.second, T))) results = surrounding_solution;
         }
         T = calculate_T(T, a, cooling_scheme, k++);
     }
@@ -40,10 +37,12 @@ pair<vector<int>, int> TSP::SA(float T0, int L0, int upper_bound, float a, int c
 }
 
 pair<vector<int>, int> TSP::generate_solution(pair<vector<int>, int> solution, int type) {
-    int last_element = solution.first.back();
+    static std::mt19937 rng(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()));
+    std::uniform_int_distribution<int> dist(0, solution.first.size() - 2);
+
     solution.first.pop_back();
-    int index1 = rand() % solution.first.size();
-    int index2 = rand() % solution.first.size();
+    int index1 = dist(rng);
+    int index2 = dist(rng);
     if(index1 > index2) {
         int temp = index1;
         index1 = index2;
@@ -59,8 +58,7 @@ pair<vector<int>, int> TSP::generate_solution(pair<vector<int>, int> solution, i
         solution.first.insert(solution.first.begin() + index2, value_to_insert);
     }
 
-    if(solution.first.front() == last_element) solution.first.push_back(last_element);
-    else solution.first.push_back(solution.first.front());
+    solution.first.push_back(solution.first.front());
     solution.second = calculate_path_length(solution.first);
     return solution;
 }
@@ -82,7 +80,10 @@ double TSP::calculate_probability(float Xa, float Xk, float T) {
 }
 
 bool TSP::decide_accept(double probability) {
-    double X = ((double) rand() / (double) RAND_MAX);
+    static std::mt19937 rng(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()));
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+    double X = dist(rng);
     if(X < probability) return true;
     else return false;
 }
