@@ -88,8 +88,8 @@ bool TSP::decide_accept(double probability) {
     else return false;
 }
 
-pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, int upper_bound, int solution_generator) {
-
+pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, int upper_bound, int solution_generator, int minutes) {
+    chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
     int restart = restart_val;
     results.second = INT_MAX;
     pair<vector<int>, int> x0;
@@ -97,28 +97,24 @@ pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, 
     else x0 = random();
     results = x0;
     pair<vector<int>, int> xa = x0;
-    vector<pair<int, int>> tabu_list;
+    vector<pair<vector<int>, int>> tabu_list;
 
     for(int iteration = 0; iteration < max_iterations; iteration++) {
+        if(chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() > minutes) return results;
         vector<pair<vector<int>, int>> surroundings = generate_surroundings(xa.first, solution_generator);
         pair<vector<int>, int> best_solution;
         best_solution.second = INT_MAX;
 
-        int best_move_attribute = -1;
-        for(int i = 0; i < surroundings.size(); i++) {
-            pair<vector<int>, int> solution = surroundings[i];
-            int move_attribute = i;
-
-            if(solution.second < best_solution.second && (!is_in_tabu_list(tabu_list, move_attribute) || solution.second < results.second)) {
+        for(const auto& solution : surroundings) {
+            if(solution.second < best_solution.second && (!is_in_tabu_list(tabu_list, solution.first) || solution.second < results.second)) {
                 best_solution = solution;
                 best_solution.second = solution.second;
-                best_move_attribute = move_attribute;
+                tabu_list.emplace_back(solution.first, tenure);
             }
         }
-        xa = best_solution;
 
+        xa = best_solution;
         if(best_solution.second < results.second) results = best_solution;
-        if(best_move_attribute != -1) tabu_list.emplace_back(best_move_attribute, tenure);
 
         update_tabu_list(tabu_list);
 
@@ -129,19 +125,16 @@ pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, 
             tabu_list.clear();
         }
     }
-
     return results;
 }
 
-void TSP::update_tabu_list(vector<pair<int, int>>& tabu_list) {
-    for(auto & i : tabu_list) i.second--;
-    tabu_list.erase(remove_if(tabu_list.begin(), tabu_list.end(),
-                              [](pair<int, int> tabu) { return tabu.second <= 0; }),
-                    tabu_list.end());
+void TSP::update_tabu_list(vector<pair<vector<int>, int>>& tabu_list) {
+    for(auto& element : tabu_list) element.second--;
+    tabu_list.erase(remove_if(tabu_list.begin(), tabu_list.end(), [](const pair<vector<int>, int>& tabu) { return tabu.second <= 0; }), tabu_list.end());
 }
 
-bool TSP::is_in_tabu_list(const vector<pair<int, int>>& tabu_list, int attribute) {
-    for(auto & i : tabu_list) if(i.first == attribute) return true;
+bool TSP::is_in_tabu_list(const vector<pair<vector<int>, int>>& tabu_list, const vector<int>& solution) {
+    for(auto& tabu : tabu_list) if(tabu.first == solution) return true;
     return false;
 }
 
