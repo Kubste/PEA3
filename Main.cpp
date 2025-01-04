@@ -10,8 +10,8 @@ void Main::run() {
     chrono::duration<double, micro> time{};
     chrono::high_resolution_clock::time_point t0;
 
-    tuple<vector<string>, vector<int>, vector<float>> config_data = file_manager.read_config_file(config_path);
-    assign_parameters(get<0>(config_data), get<1>(config_data), get<2>(config_data));
+    tuple<vector<string>, vector<int>> config_data = File_manager::read_config_file(config_path);
+    assign_parameters(get<0>(config_data), get<1>(config_data));
     data = file_manager.read_data_file(data_path);
     matrix = data.first;
     optimal_value = data.second;
@@ -25,10 +25,7 @@ void Main::run() {
 
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
-        if(method == 1) results = tsp.SA(T0, L0, upper_bound, a, cooling_scheme, solution_generator, minutesSA);
-        else if(method == 2) results = tsp.TS(max_iterations, tabu_tenure, restart_val, upper_bound, solution_generator, minutesTS);
-
-
+        results = tsp.TS(tabu_tenure, restart_val, upper_bound, solution_generator, minutes, optimal_value);
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
         print_partial_results(results, i + 1, time);
     }
@@ -39,25 +36,16 @@ void Main::run() {
                                total_time/time_measurements, total_absolute_error/repetitions, total_relative_error/repetitions);
 }
 
-void Main::assign_parameters(vector<string> parameters_string, vector<int> parameters_int, vector<float> parameters_float) {
+void Main::assign_parameters(vector<string> parameters_string, vector<int> parameters_int) {
     data_path = parameters_string[0];
     result_path = parameters_string[1];
-    method = parameters_int[0];
-    if(parameters_int[1] == -1) minutesSA = INT_MAX;
-    else minutesSA = parameters_int[1];
-    if(parameters_int[2] == -1) minutesTS = INT_MAX;
-    else minutesTS = parameters_int[2];
-    cooling_scheme = parameters_int[3];
-    solution_generator = parameters_int[4];
-    L0 = parameters_int[5];
-    max_iterations = parameters_int[6];
-    tabu_tenure = parameters_int[7];
-    restart_val = parameters_int[8];
-    upper_bound = parameters_int[9];
-    repetitions = parameters_int[10];
-    progress_indicator = parameters_int[11];
-    T0 = parameters_float[0];
-    a = parameters_float[1];
+    minutes = parameters_int[0];
+    solution_generator = parameters_int[1];
+    tabu_tenure = parameters_int[2];
+    restart_val = parameters_int[3];
+    upper_bound = parameters_int[4];
+    repetitions = parameters_int[5];
+    progress_indicator = parameters_int[6];
 }
 
 void Main::print_info() {
@@ -65,14 +53,10 @@ void Main::print_info() {
     size_t position = data_path.find_last_of('/');
     cout << endl << "Plik zawierajacy dane problemu: " << data_path.substr(position + 1) << endl;
     cout << "Wynik optymalny: " << optimal_value << endl;
-    cout << "Wybrana metoda: ";
-    if(method == 1) cout << "Symulowane wyzarzanie" << endl;
-    else if(method == 2) cout << "Tabu Search" << endl;
+    cout << "Wybrana metoda: Tabu Search" << endl;
     cout << "Liczba powtorzen przeszukania: " << repetitions << endl;
-    if(method == 1 && minutesSA != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesSA << " min" << endl;
-    else if(method == 1) cout << "Brak ograniczenia czasowego" << endl;
-    else if(method == 2 && minutesTS != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutesTS << " min" << endl;
-    else if(method == 2) cout << "Brak ograniczenia czasowego" << endl;
+    if(minutes != INT_MAX) cout << "Maksymalny czas przeszukania: " << minutes << " min" << endl;
+    else cout << "Brak ograniczenia czasowego" << endl;
     cout << endl;
 }
 

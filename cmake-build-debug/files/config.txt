@@ -1,16 +1,9 @@
-Ścieżka pliku wejściowego# data20a.txt
+Ścieżka pliku wejściowego# data10a.txt
 Ścieżak pliku wyjściowego# results.csv
-Wybrana metoda 1 - symulowane wyzarzanie 2 - Tabu Search# 2
-Maksymalny czas przeszukiwania dla metody symulowanego wyzarzania(-1 -> brak ograniczenia)# 15
-Maksymalny czas przeszukiwania dla metody Tabu Search(-1 -> brak ograniczenia)# 5
-Początkowa wartość parametru kontrolnego("temperatury")# 200
-Wartość parametru a# 1.0
-Schemat chłodzenia (1 - liniowy, 2 - geometryczny(1), 3 - geometryczny(2), 4 - geometryczny(3), 5 - logarytmiczny)# 4
-Sposób generowania rozwiązania w otoczeniu(1 - swap, 2 - inversion, 3 - insertion)# 2
-Początkowa liczba transformacji# 100000
-Liczba iteracji dla algorytmu Tabu Search# 100000
+Maksymalny czas przeszukiwania(-1 -> brak ograniczenia)# 15
+Sposób generowania rozwiązań w otoczeniu(1 - swap, 2 - inversion, 3 - insertion)# 3
 Wartość kadencji# 10000
-Po ilu iteracjach wykonywane będzie restartowanie# 10000
+Po ilu iteracjach bez poprawy wyniku wykonywane będzie restartowanie listy tabu# 10000
 Czy zastosować ograniczenie górne wyznaczone za pomocą algorytmu NN 0 - nie 1 - tak# 0
 Liczba powtorzeń przeszukiwania instancji# 10
 Wyświetlanie wskaźnika postępu 0 - wyłączone 1 - włączone# 0

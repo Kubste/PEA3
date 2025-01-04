@@ -9,86 +9,7 @@ void TSP::set_min_value() {
     for(auto & i : matrix) for(int j : i) if(j < min_value && j >= 0) min_value = j;
 }
 
-pair<vector<int>, int> TSP::SA(float T0, int L0, int upper_bound, float a, int cooling_scheme, int solution_generator, int minutes) {
-    chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
-    float T = T0;
-    int L = L0;
-    pair<vector<int>, int> surrounding_solution;
-
-    results.second = INT_MAX;
-    if(upper_bound == 1) results = NN();
-    else results = random();
-    surrounding_solution = results;
-
-    int k = 0;
-    while(T > 1 && chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() < minutes) {
-        for(int i = 0; i < L; i++) {
-            while(true) {
-                surrounding_solution = generate_solution(surrounding_solution, solution_generator);
-                if(surrounding_solution.second != INT_MAX) break;
-            }
-
-            if(surrounding_solution.second < results.second) results = surrounding_solution;
-            else if(decide_accept(calculate_probability(results.second, surrounding_solution.second, T))) results = surrounding_solution;
-        }
-        T = calculate_T(T, a, cooling_scheme, k++);
-    }
-    return results;
-}
-
-pair<vector<int>, int> TSP::generate_solution(pair<vector<int>, int> solution, int type) {
-    static std::mt19937 rng(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()));
-    std::uniform_int_distribution<int> dist(0, solution.first.size() - 2);
-
-    solution.first.pop_back();
-    int index1 = dist(rng);
-    int index2 = dist(rng);
-    if(index1 > index2) {
-        int temp = index1;
-        index1 = index2;
-        index2 = temp;
-    }
-
-    if(type == 1) swap(solution.first[index1], solution.first[index2]);
-    else if(type == 2) reverse(solution.first.begin() + index1, solution.first.begin() + index2 + 1);
-    else if(type == 3) {
-        int value_to_insert = solution.first[index1];
-        solution.first.erase(solution.first.begin() + index1);
-        if(index2 > index1) --index2;
-        solution.first.insert(solution.first.begin() + index2, value_to_insert);
-    }
-
-    solution.first.push_back(solution.first.front());
-    solution.second = calculate_path_length(solution.first);
-    return solution;
-}
-
-float TSP::calculate_T(float T, float a, int cooling_scheme, int k) {
-    switch(cooling_scheme) {
-        case 1: return T - a;
-        case 2: return a * T;
-        case 3: return T * pow(a, k);
-        case 4: return T * pow((1 + pow(a, k)), -1);
-        case 5: return T / (log(1 + k + 1));
-        default: return 0;
-    }
-}
-
-double TSP::calculate_probability(float Xa, float Xk, float T) {
-    const double EulerConstant = std::exp(1.0);
-    return pow(EulerConstant, (Xa - Xk) / T);
-}
-
-bool TSP::decide_accept(double probability) {
-    static std::mt19937 rng(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()));
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-
-    double X = dist(rng);
-    if(X < probability) return true;
-    else return false;
-}
-
-pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, int upper_bound, int solution_generator, int minutes) {
+pair<vector<int>, int> TSP::TS(int tenure, int restart_val, int upper_bound, int solution_generator, int minutes, int optimal_value) {
     chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
     int restart = restart_val;
     results.second = INT_MAX;
@@ -96,11 +17,12 @@ pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, 
     if(upper_bound == 1) x0 = NN();
     else x0 = random();
     results = x0;
+    int current_path_length = results.second;
     pair<vector<int>, int> xa = x0;
     vector<pair<vector<int>, int>> tabu_list;
 
-    for(int iteration = 0; iteration < max_iterations; iteration++) {
-        if(chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() > minutes) return results;
+    while(chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() < minutes) {
+        if(results.second == optimal_value) return results;
         vector<pair<vector<int>, int>> surroundings = generate_surroundings(xa.first, solution_generator);
         pair<vector<int>, int> best_solution;
         best_solution.second = INT_MAX;
@@ -118,7 +40,12 @@ pair<vector<int>, int> TSP::TS(int max_iterations, int tenure, int restart_val, 
 
         update_tabu_list(tabu_list);
 
-        if(--restart < 0) {
+        if(current_path_length == results.second) restart--;
+        else {
+            current_path_length = results.second;
+            restart = restart_val;
+        }
+        if(restart < 0) {
             restart = restart_val;
             if(upper_bound) xa = NN();
             else xa = random();

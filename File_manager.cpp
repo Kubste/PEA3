@@ -7,8 +7,8 @@
 
 using namespace std;
 
-tuple<vector<string>, vector<int>, vector<float>> File_manager::read_config_file(const string& path) {
-    tuple<vector<string>, vector<int>, vector<float>> results;
+tuple<vector<string>, vector<int>> File_manager::read_config_file(const string& path) {
+    tuple<vector<string>, vector<int>> results;
     string line;
     ifstream file;
     string sub_str;
@@ -21,7 +21,6 @@ tuple<vector<string>, vector<int>, vector<float>> File_manager::read_config_file
             size_t position = line.find('#');
             sub_str = line.substr(position + 2);
             if(line_num < 2) get<0>(results).push_back("files/" + sub_str);
-            else if(line_num == 5 || line_num == 6) get<2>(results).push_back(stof(sub_str));
             else get<1>(results).push_back(stoi(sub_str));
 
             line_num++;
