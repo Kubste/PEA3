@@ -1,9 +1,10 @@
-Ścieżka pliku wejściowego# data10a.txt
+Ścieżka pliku wejściowego# data20a.txt
 Ścieżak pliku wyjściowego# results.csv
 Maksymalny czas przeszukiwania(-1 -> brak ograniczenia)# 15
-Sposób generowania rozwiązań w otoczeniu(1 - swap, 2 - inversion, 3 - insertion)# 3
-Wartość kadencji# 10000
+Sposób generowania rozwiązań w otoczeniu(1 - swap, 2 - inversion, 3 - insertion)# 1
 Po ilu iteracjach bez poprawy wyniku wykonywane będzie restartowanie listy tabu# 10000
+Wartość współczynnika kadencji# 1.0
+Wartość współczynnika rozmiaru listy tabu# 0.5
 Czy zastosować ograniczenie górne wyznaczone za pomocą algorytmu NN 0 - nie 1 - tak# 0
 Liczba powtorzeń przeszukiwania instancji# 10
 Wyświetlanie wskaźnika postępu 0 - wyłączone 1 - włączone# 0

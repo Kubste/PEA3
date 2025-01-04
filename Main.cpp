@@ -10,8 +10,8 @@ void Main::run() {
     chrono::duration<double, micro> time{};
     chrono::high_resolution_clock::time_point t0;
 
-    tuple<vector<string>, vector<int>> config_data = File_manager::read_config_file(config_path);
-    assign_parameters(get<0>(config_data), get<1>(config_data));
+    tuple<vector<string>, vector<int>, vector<float>> config_data = File_manager::read_config_file(config_path);
+    assign_parameters(get<0>(config_data), get<1>(config_data), get<2>(config_data));
     data = file_manager.read_data_file(data_path);
     matrix = data.first;
     optimal_value = data.second;
@@ -25,7 +25,7 @@ void Main::run() {
 
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
-        results = tsp.TS(tabu_tenure, restart_val, upper_bound, solution_generator, minutes, optimal_value);
+        results = tsp.TS(restart_val, upper_bound, solution_generator, minutes, optimal_value, tenure_factor, list_factor);
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
         print_partial_results(results, i + 1, time);
     }
@@ -36,16 +36,17 @@ void Main::run() {
                                total_time/time_measurements, total_absolute_error/repetitions, total_relative_error/repetitions);
 }
 
-void Main::assign_parameters(vector<string> parameters_string, vector<int> parameters_int) {
+void Main::assign_parameters(vector<string> parameters_string, vector<int> parameters_int, vector<float> parameters_float) {
     data_path = parameters_string[0];
     result_path = parameters_string[1];
     minutes = parameters_int[0];
     solution_generator = parameters_int[1];
-    tabu_tenure = parameters_int[2];
-    restart_val = parameters_int[3];
-    upper_bound = parameters_int[4];
-    repetitions = parameters_int[5];
-    progress_indicator = parameters_int[6];
+    restart_val = parameters_int[2];
+    upper_bound = parameters_int[3];
+    repetitions = parameters_int[4];
+    progress_indicator = parameters_int[5];
+    tenure_factor = parameters_float[0];
+    list_factor = parameters_float[1];
 }
 
 void Main::print_info() {

@@ -9,7 +9,7 @@ void TSP::set_min_value() {
     for(auto & i : matrix) for(int j : i) if(j < min_value && j >= 0) min_value = j;
 }
 
-pair<vector<int>, int> TSP::TS(int tenure, int restart_val, int upper_bound, int solution_generator, int minutes, int optimal_value) {
+pair<vector<int>, int> TSP::TS(int restart_val, int upper_bound, int solution_generator, int minutes, int optimal_value, float tenure_factor, float list_factor) {
     chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
     int restart = restart_val;
     results.second = INT_MAX;
@@ -20,6 +20,9 @@ pair<vector<int>, int> TSP::TS(int tenure, int restart_val, int upper_bound, int
     int current_path_length = results.second;
     pair<vector<int>, int> xa = x0;
     vector<pair<vector<int>, int>> tabu_list;
+
+    int tenure = tenure_factor * float(matrix.size()) * float((matrix.size() - 1));
+    if(solution_generator != 3) tenure = tenure / 2;
 
     while(chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() < minutes) {
         if(results.second == optimal_value) return results;

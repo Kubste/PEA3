@@ -20,12 +20,13 @@ private:
     string result_path;
     int minutes;
     int solution_generator;
-    int tabu_tenure;
     int restart_val;
     int upper_bound;
     int optimal_value;
     int progress_indicator;
     int repetitions;
+    float tenure_factor;
+    float list_factor;
     File_manager file_manager;
     vector<vector<int>> matrix;
     TSP tsp;
@@ -35,7 +36,7 @@ private:
     vector<chrono::duration<double, micro>> total_times;
     int time_measurements = 0;
 
-    void assign_parameters(vector<string> parameters_string, vector<int> parameters_int);
+    void assign_parameters(vector<string> parameters_string, vector<int> parameters_int, vector<float> parameters_float);
     void print_info();
     void print_partial_results(pair<vector<int>, int> results, int repetition, chrono::duration<double, micro> time);
     int calculate_path_length(vector<int> path);

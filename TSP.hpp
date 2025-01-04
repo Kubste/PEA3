@@ -23,7 +23,7 @@ public:
     void set_matrix(vector<vector<int>> matrix);
     pair<vector<int>, int> NN();
     void explore_paths(vector<int> path, int path_length, vector<int> Q, int current_node, int start_node, pair<vector<int>, int> &resultsNN);
-    pair<vector<int>, int> TS(int tenure, int restart_val, int upper_bound, int solution_generator, int minutesTS, int optimal_value);
+    pair<vector<int>, int> TS(int restart_val, int upper_bound, int solution_generator, int minutes, int optimal_value, float tenure_factor, float list_factor);
 
 private:
     vector<vector<int>> matrix;
