@@ -20,7 +20,8 @@ private:
     string result_path;
     int minutes;
     int solution_generator;
-    int restart_val;
+    float restart_factor;
+    float end_factor;
     int upper_bound;
     int optimal_value;
     int progress_indicator;

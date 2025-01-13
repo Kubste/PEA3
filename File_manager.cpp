@@ -21,7 +21,7 @@ tuple<vector<string>, vector<int>, vector<float>> File_manager::read_config_file
             size_t position = line.find('#');
             sub_str = line.substr(position + 2);
             if(line_num < 2) get<0>(results).push_back("files/" + sub_str);
-            else if(line_num == 5 || line_num == 6) get<2>(results).push_back(stof(sub_str));
+            else if(line_num == 4 || line_num == 5 || line_num == 6 || line_num == 7) get<2>(results).push_back(stof(sub_str));
             else get<1>(results).push_back(stoi(sub_str));
 
             line_num++;

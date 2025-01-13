@@ -9,9 +9,8 @@ void TSP::set_min_value() {
     for(auto & i : matrix) for(int j : i) if(j < min_value && j >= 0) min_value = j;
 }
 
-pair<vector<int>, int> TSP::TS(int restart_val, int upper_bound, int solution_generator, int minutes, int optimal_value, float tenure_factor, float list_factor) {
+pair<vector<int>, int> TSP::TS(float end_factor, float restart_factor, int upper_bound, int solution_generator, int minutes, int optimal_value, float tenure_factor, float list_factor) {
     chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
-    int restart = restart_val;
     results.second = INT_MAX;
     pair<vector<int>, int> x0;
     if(upper_bound == 1) x0 = NN();
@@ -19,10 +18,13 @@ pair<vector<int>, int> TSP::TS(int restart_val, int upper_bound, int solution_ge
     results = x0;
     int current_path_length = results.second;
     pair<vector<int>, int> xa = x0;
-    vector<pair<vector<int>, int>> tabu_list;
+    deque<pair<vector<int>, int>> tabu_list;
 
-    int tenure = tenure_factor * float(matrix.size()) * float((matrix.size() - 1));
-    if(solution_generator != 3) tenure = tenure / 2;
+    float surroundings_size = float(generate_surroundings(xa.first, solution_generator).size());
+    int tenure = tenure_factor * surroundings_size;
+    int max_tabu_size = list_factor * surroundings_size;
+    int end_counter = end_factor * surroundings_size;
+    int restart_counter = restart_factor * surroundings_size;
 
     while(chrono::duration_cast<chrono::minutes>(chrono::steady_clock::now() - start).count() < minutes) {
         if(results.second == optimal_value) return results;
@@ -34,7 +36,12 @@ pair<vector<int>, int> TSP::TS(int restart_val, int upper_bound, int solution_ge
             if(solution.second < best_solution.second && (!is_in_tabu_list(tabu_list, solution.first) || solution.second < results.second)) {
                 best_solution = solution;
                 best_solution.second = solution.second;
+
                 tabu_list.emplace_back(solution.first, tenure);
+
+                if(tabu_list.size() > max_tabu_size) {
+                    tabu_list.pop_front();
+                }
             }
         }
 
@@ -43,28 +50,32 @@ pair<vector<int>, int> TSP::TS(int restart_val, int upper_bound, int solution_ge
 
         update_tabu_list(tabu_list);
 
-        if(current_path_length == results.second) restart--;
-        else {
+        if(current_path_length == results.second) {
+            end_counter--;
+            restart_counter--;
+        } else {
             current_path_length = results.second;
-            restart = restart_val;
+            end_counter = end_factor * surroundings_size;
+            restart_counter = restart_factor * surroundings_size;
         }
-        if(restart < 0) {
-            restart = restart_val;
-            if(upper_bound) xa = NN();
-            else xa = random();
+
+        if(restart_counter < 0) {
+            restart_counter = restart_factor * surroundings_size;
+            xa = random();
             tabu_list.clear();
         }
+        if(end_counter < 0) return results;
     }
     return results;
 }
 
-void TSP::update_tabu_list(vector<pair<vector<int>, int>>& tabu_list) {
+void TSP::update_tabu_list(deque<pair<vector<int>, int>>& tabu_list) {
     for(auto& element : tabu_list) element.second--;
-    tabu_list.erase(remove_if(tabu_list.begin(), tabu_list.end(), [](const pair<vector<int>, int>& tabu) { return tabu.second <= 0; }), tabu_list.end());
+    while(!tabu_list.empty() && tabu_list.front().second <= 0) tabu_list.pop_front();
 }
 
-bool TSP::is_in_tabu_list(const vector<pair<vector<int>, int>>& tabu_list, const vector<int>& solution) {
-    for(auto& tabu : tabu_list) if(tabu.first == solution) return true;
+bool TSP::is_in_tabu_list(const deque<pair<vector<int>, int>>& tabu_list, const vector<int>& solution) {
+    for(const auto& tabu : tabu_list) if(tabu.first == solution) return true;
     return false;
 }
 

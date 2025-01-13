@@ -25,7 +25,7 @@ void Main::run() {
 
     for(int i = 0; i < repetitions; i++) {
         t0 = chrono::high_resolution_clock::now();
-        results = tsp.TS(restart_val, upper_bound, solution_generator, minutes, optimal_value, tenure_factor, list_factor);
+        results = tsp.TS(end_factor, restart_factor, upper_bound, solution_generator, minutes, optimal_value, tenure_factor, list_factor);
         time = chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - t0);
         print_partial_results(results, i + 1, time);
     }
@@ -41,12 +41,13 @@ void Main::assign_parameters(vector<string> parameters_string, vector<int> param
     result_path = parameters_string[1];
     minutes = parameters_int[0];
     solution_generator = parameters_int[1];
-    restart_val = parameters_int[2];
-    upper_bound = parameters_int[3];
-    repetitions = parameters_int[4];
-    progress_indicator = parameters_int[5];
-    tenure_factor = parameters_float[0];
-    list_factor = parameters_float[1];
+    upper_bound = parameters_int[2];
+    repetitions = parameters_int[3];
+    progress_indicator = parameters_int[4];
+    restart_factor = parameters_float[0];
+    end_factor = parameters_float[1];
+    tenure_factor = parameters_float[2];
+    list_factor = parameters_float[3];
 }
 
 void Main::print_info() {
